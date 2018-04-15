@@ -1,0 +1,41 @@
+.mr-5 {
+    margin-right: 5px;
+}
+
+.ml-5 {
+    margin-left: 5px;
+}
+
+.pr-5 {
+    padding-right: 5px;
+}
+
+.pl-5 {
+    padding-left: 5px;
+}
+
+.mt-5 {
+    margin-top: 5px;
+}
+
+.mt-15 {
+    margin-top: 15px;
+}
+
+.fa-times-circle:hover {
+    color: #ac2925;
+    cursor: pointer;
+}
+
+#spnStatus:hover {
+    cursor: pointer;
+}
+
+.sort_selected::after {
+    content: '\f00c';
+    font-family: "Font Awesome 5 Solid";
+    font-weight: normal;
+    font-style: normal;
+    margin: 0px 0px 0px 10px;
+    display: inline-block;
+}

@@ -1,4 +1,8 @@
 import React, { Component } from 'react';
+import { toggleStatus } from '../actions/index';
+import { connect } from 'react-redux';
+import { deleteTask } from '../actions/index';
+import { closeForm } from '../actions/index';
 
 class TaskItem extends Component {
     onChangeStatus = () => {
@@ -7,6 +11,7 @@ class TaskItem extends Component {
 
     onDelete = () => {
         this.props.onDelete(this.props.task.id);
+        this.props.onCloseForm();
     }
 
     onEdit = () => {
@@ -40,4 +45,18 @@ class TaskItem extends Component {
     }
 }
 
-export default TaskItem;
+let mapStateToProps = () => {
+    return {
+
+    };
+}
+
+let mapDispatchToProps = (dispatch) => {
+    return {
+        onChangeStatus: (id) => { dispatch(toggleStatus(id)); },
+        onDelete: (id) => { dispatch(deleteTask(id)); },
+        onCloseForm: () => { dispatch(closeForm()); }
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(TaskItem);

@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import TaskForm from './components/TaskForm';
 import Toolbar from './components/Toolbar';
 import TaskList from './components/TaskList';
+import { connect } from 'react-redux';
+import { toggleForm } from './actions/index';
 
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       tasks: [],
-      displayForm: false,
       edittingTask: null,
       filter: {
         name: "",
@@ -22,13 +23,6 @@ class App extends Component {
     };
   }
 
-  componentWillMount() {
-    if (localStorage && localStorage.getItem('tasks')) {
-      var tasks = JSON.parse(localStorage.getItem('tasks'));
-      this.setState({ tasks: tasks });
-    }
-  }
-
   s4() {
     return Math.floor((1 + Math.random()) * 0x10000).toString(16).substring(1);
   }
@@ -38,47 +32,24 @@ class App extends Component {
   }
 
   onToggleForm = () => {
-    if (this.state.edittingTask) {
-      this.setState({
-        displayForm: true,
-        edittingTask: null
-      });
-    } else {
-      this.setState({
-        displayForm: !this.state.displayForm,
-        edittingTask: null
-      });
-    }
-  }
-
-  onCloseForm = () => {
-    this.setState({
-      displayForm: false
-    });
+    // if (this.state.edittingTask) {
+    //   this.setState({
+    //     displayForm: true,
+    //     edittingTask: null
+    //   });
+    // } else {
+    //   this.setState({
+    //     displayForm: !this.state.displayForm,
+    //     edittingTask: null
+    //   });
+    // }
+    this.props.onToggleForm();
   }
 
   onOpenForm = () => {
     this.setState({
       displayForm: true
     });
-  }
-
-  onSubmit = (data) => {
-    const { tasks } = this.state;
-    if (data.id === "") {
-      data.id = this.generateId();
-      tasks.push(data);
-    } else {
-      var foundIndex = tasks.findIndex(task => task.id === data.id);
-      tasks[foundIndex] = data;
-    }
-
-    this.setState({
-      tasks: tasks,
-      edittingTask: null
-    });
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-    this.onCloseForm();
   }
 
   onSearch = (keyword) => {
@@ -96,30 +67,30 @@ class App extends Component {
     });
   }
 
-  onChangeStatus = (itemId) => {
-    const { tasks } = this.state;
-    let foundItem = tasks.find(item => item.id === itemId);
-    if (foundItem) {
-      foundItem.status = !foundItem.status;
-      this.setState({
-        tasks: tasks
-      });
-      localStorage.setItem('tasks', JSON.stringify(tasks));
-    }
-  }
+  // onChangeStatus = (itemId) => {
+  //   const { tasks } = this.state;
+  //   let foundItem = tasks.find(item => item.id === itemId);
+  //   if (foundItem) {
+  //     foundItem.status = !foundItem.status;
+  //     this.setState({
+  //       tasks: tasks
+  //     });
+  //     localStorage.setItem('tasks', JSON.stringify(tasks));
+  //   }
+  // }
 
-  onDelete = (itemId) => {
-    const { tasks } = this.state;
-    let foundIndex = tasks.findIndex(item => item.id === itemId);
-    if (foundIndex !== -1) {
-      tasks.splice(foundIndex, 1);
-      this.setState({
-        tasks: tasks
-      });
-      localStorage.setItem('tasks', JSON.stringify(tasks));
-    }
-    this.onCloseForm();
-  }
+  // onDelete = (itemId) => {
+  //   const { tasks } = this.state;
+  //   let foundIndex = tasks.findIndex(item => item.id === itemId);
+  //   if (foundIndex !== -1) {
+  //     tasks.splice(foundIndex, 1);
+  //     this.setState({
+  //       tasks: tasks
+  //     });
+  //     localStorage.setItem('tasks', JSON.stringify(tasks));
+  //   }
+  //   this.onCloseForm();
+  // }
 
   onEdit = (itemId) => {
     const { edittingTask, tasks } = this.state;
@@ -143,7 +114,8 @@ class App extends Component {
   
 
   render() {    
-    let { tasks, displayForm, filter, keyword, sort } = this.state;
+    let { tasks, filter, keyword, sort } = this.state;
+    let { displayForm } = this.props;
 
     tasks = tasks.filter(task => task.name.toLowerCase().indexOf(filter.name) !== -1);
     tasks = tasks.filter(task => {
@@ -171,9 +143,7 @@ class App extends Component {
       });
     }
 
-    let taskFormElement = displayForm ? <TaskForm onCloseForm={this.onCloseForm}
-      onSubmit={this.onSubmit}
-      task={this.state.edittingTask} /> : ''
+    let taskFormElement = displayForm ? <TaskForm task={this.state.edittingTask} /> : ''
     return (
       <div className="container">
         <div className="text-center">
@@ -192,9 +162,7 @@ class App extends Component {
             {/* Toolbar */}
             <Toolbar onSearch={this.onSearch} onSort={this.onSort} />
             {/* TaskList */}
-            <TaskList
-              onChangeStatus={this.onChangeStatus}
-              onDelete={this.onDelete}
+            <TaskList   
               onEdit={this.onEdit}
               onFilter={this.onFilter} />
           </div>
@@ -204,4 +172,18 @@ class App extends Component {
   }
 }
 
-export default App;
+const mapStateToProps = state => {
+  return {
+    displayForm: state.displayForm
+  }
+}
+
+const mapDispatchToProps = dispatch => {
+  return {
+    onToggleForm: () => {
+      dispatch(toggleForm());
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App);
